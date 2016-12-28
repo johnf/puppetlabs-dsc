@@ -113,7 +113,7 @@ Puppet::Type.newtype(:dsc_xwindowsupdateagent) do
       unless value.kind_of?(String)
         fail("Invalid value '#{value}'. Should be a string")
       end
-      unless ['Disabled', 'disabled', 'ScheduledInstallation', 'scheduledinstallation'].include?(value)
+      unless ['Disabled', 'disabled', 'ScheduledInstallation', 'scheduledinstallation', 'scheduled installation', 'Scheduled installation'].include?(value)
         fail("Invalid value '#{value}'. Valid values are Disabled, ScheduledInstallation")
       end
     end
