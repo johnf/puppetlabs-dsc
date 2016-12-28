@@ -238,6 +238,11 @@ function Get-WuaAuNotificationLevelInt {
     }
 
     return $intNotificationLevel
+
+    # JF
+    # $settings = Get-WuaAuSettings
+    # $settings.NotificationLevel = $intNotificationLevel
+    # $settings.Save()
 }
 
 function Get-WuaSystemInfo
