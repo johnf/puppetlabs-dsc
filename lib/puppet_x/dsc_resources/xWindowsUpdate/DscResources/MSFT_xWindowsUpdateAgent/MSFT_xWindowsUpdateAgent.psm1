@@ -176,6 +176,13 @@ function Get-WuaAuNotificationLevel
     } -ExceptionReturnValue [string]::Empty
 }
 
+function Get-WuaAuRecommendedUpdates
+{
+    return Get-WuaWrapper -tryBlock {
+        return (Get-WuaAuSettings).IncludeRecommendedUpdates)
+    } -ExceptionReturnValue [string]::Empty
+}
+
 function Invoke-WuaDownloadUpdates
 {
     param(
@@ -243,6 +250,17 @@ function Get-WuaAuNotificationLevelInt {
     # $settings = Get-WuaAuSettings
     # $settings.NotificationLevel = $intNotificationLevel
     # $settings.Save()
+}
+
+function Set-WuaAuRecommendedUpdates
+{
+    param(
+        [bool]
+        $includeRecommended = $false
+    )
+    $settings = Get-WuaAuSettings
+    $settings.IncludeRecommendedUpdates = $includeRecommended
+    $settings.Save()
 }
 
 function Get-WuaSystemInfo
@@ -350,6 +368,9 @@ function Get-TargetResource
         [System.String]
         $Notifications,
         
+        [bool]
+        $RecommendedUpdates = $false        
+
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
         [System.String]
@@ -380,6 +401,7 @@ function Get-TargetResource
     }
 
     $notificationLevel = (Get-WuaAuNotificationLevel)
+    $recommendedUpdates = (Get-WuaAuRecommendedUpdates)
 
        
     $CategoryReturn = $Category
@@ -404,6 +426,7 @@ function Get-TargetResource
                         TotalUpdatesNotInstalled = $totalUpdatesNotInstalled 
                         RebootRequired = $rebootRequired
                         Notifications = $notificationLevel
+                        RecommendedUpdates = $recommendedUpdates 
                         Source = $SourceReturn
                         UpdateNow = $UpdateNowReturn
                     }
@@ -430,6 +453,9 @@ function Set-TargetResource
         [ValidateSet("Disabled","ScheduledInstallation","Scheduled installation")]
         [System.String]
         $Notifications,
+
+        [bool]
+        $RecommendedUpdates = $false,
         
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
@@ -448,6 +474,8 @@ function Set-TargetResource
     Write-Verbose "updateNow compliant: $updateCompliant"
     $notificationCompliant = (!$Notifications -or $Notifications -eq $Get.Notifications)
     Write-Verbose "notifications compliant: $notificationCompliant"
+    $recommendedUpdatesCompliant = (!$RecommendedUpdates -or $RecommendedUpdates -eq $Get.RecommendedUpdates)
+    Write-Verbose "recommended updates compliant: $recommendedUpdatesCompliant"
     $SourceCompliant = (!$Source -or $Source -eq $Get.Source)
     Write-Verbose "service compliant: $notificationCompliant"
 
@@ -501,6 +529,21 @@ function Set-TargetResource
                 }
             }    
 
+            If(!$recommendedUpdatesCompliant -and $PSCmdlet.ShouldProcess("Set recommended updates to: $recommendedUpdates"))
+            {
+                Try
+                {
+                    #TODO verify that group policy is not overriding this settings
+                    # if it is throw an error, if it conflicts
+                    Set-WuaAuRecommendedUpdates -includeRecommended $RecommendedUpdates
+                }
+                Catch
+                {
+                    $ErrorMsg = $_.Exception.Message
+                    Write-Verbose $ErrorMsg
+                }
+            }
+
             If(!$SourceCompliant )
             {
                 if($Source -eq 'MicrosoftUpdate' -and $PSCmdlet.ShouldProcess("Enable Microsoft Update Service"))
@@ -536,6 +579,9 @@ function Test-TargetResource
         [ValidateSet("Disabled","ScheduledInstallation","Scheduled installation")]
         [System.String]
         $Notifications,
+
+        [bool]
+        $RecommendedUpdates = $false
         
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
@@ -554,9 +600,11 @@ function Test-TargetResource
     Write-Verbose "updateNow compliant: $updateCompliant"
     $notificationCompliant = (!$Notifications -or $Notifications -eq $Get.Notifications)
     Write-Verbose "notifications compliant: $notificationCompliant"
+    $recommendedUpdatesCompliant = (!$RecommednedUpdates -or $RecommednedUpdates -eq $Get.RecommednedUpdates)
+    Write-Verbose "recommended updates compliant: $recommednedUpdatesCompliant"
     $SourceCompliant = (!$Source -or $Source -eq $Get.Source)
     Write-Verbose "service compliant: $notificationCompliant"
-    If($updateCompliant -and $notificationCompliant -and $SourceCompliant)
+    If($updateCompliant -and $notificationCompliant -and $SourceCompliant -and $recommendedUpdatesCompliant)
     {
         return $true
     }
@@ -585,6 +633,9 @@ function Test-TargetResourceProperties
         [System.String]
         $Notifications,
         
+        [bool]
+        $RecommendedUpdates
+
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
         [System.String]
