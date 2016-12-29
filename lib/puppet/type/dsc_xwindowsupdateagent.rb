@@ -137,6 +137,22 @@ Puppet::Type.newtype(:dsc_xwindowsupdateagent) do
     end
   end
 
+  # Name:         RecommendedUpdates
+  # Type:         boolean
+  # IsMandatory:  False
+  # Values:       None
+  newparam(:dsc_recommendedupdates) do
+    def mof_type; 'boolean' end
+    def mof_is_embedded?; false end
+    desc "RecommendedUpdates - Indicates if Recommended Updates should be included."
+    validate do |value|
+    end
+    newvalues(true, false)
+    munge do |value|
+      PuppetX::Dsc::TypeHelpers.munge_boolean(value.to_s)
+    end
+  end
+
   # Name:         UpdateNow
   # Type:         boolean
   # IsMandatory:  False

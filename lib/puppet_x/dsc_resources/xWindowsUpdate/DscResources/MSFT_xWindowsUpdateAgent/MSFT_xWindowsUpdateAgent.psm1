@@ -179,7 +179,7 @@ function Get-WuaAuNotificationLevel
 function Get-WuaAuRecommendedUpdates
 {
     return Get-WuaWrapper -tryBlock {
-        return (Get-WuaAuSettings).IncludeRecommendedUpdates)
+        return (Get-WuaAuSettings).IncludeRecommendedUpdates
     } -ExceptionReturnValue [string]::Empty
 }
 
@@ -369,7 +369,7 @@ function Get-TargetResource
         $Notifications,
         
         [bool]
-        $RecommendedUpdates = $false        
+        $RecommendedUpdates = $false,
 
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
@@ -581,7 +581,7 @@ function Test-TargetResource
         $Notifications,
 
         [bool]
-        $RecommendedUpdates = $false
+        $RecommendedUpdates = $false,
         
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
@@ -600,8 +600,8 @@ function Test-TargetResource
     Write-Verbose "updateNow compliant: $updateCompliant"
     $notificationCompliant = (!$Notifications -or $Notifications -eq $Get.Notifications)
     Write-Verbose "notifications compliant: $notificationCompliant"
-    $recommendedUpdatesCompliant = (!$RecommednedUpdates -or $RecommednedUpdates -eq $Get.RecommednedUpdates)
-    Write-Verbose "recommended updates compliant: $recommednedUpdatesCompliant"
+    $recommendedUpdatesCompliant = (!$RecommendedUpdates -or $RecommendedUpdates -eq $Get.RecommendedUpdates)
+    Write-Verbose "recommended updates compliant: $recommendedUpdatesCompliant"
     $SourceCompliant = (!$Source -or $Source -eq $Get.Source)
     Write-Verbose "service compliant: $notificationCompliant"
     If($updateCompliant -and $notificationCompliant -and $SourceCompliant -and $recommendedUpdatesCompliant)
@@ -634,7 +634,7 @@ function Test-TargetResourceProperties
         $Notifications,
         
         [bool]
-        $RecommendedUpdates
+        $RecommendedUpdates,
 
         [parameter(Mandatory = $true)]
         [ValidateSet("WindowsUpdate","MicrosoftUpdate","WSUS")]
