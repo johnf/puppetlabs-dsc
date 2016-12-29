@@ -104,17 +104,17 @@ Puppet::Type.newtype(:dsc_xwindowsupdateagent) do
   # Name:         Notifications
   # Type:         string
   # IsMandatory:  False
-  # Values:       ["Disabled", "ScheduledInstallation"]
+  # Values:       ["Disabled", "ScheduledInstallation", "Scheduled installation"]
   newparam(:dsc_notifications) do
     def mof_type; 'string' end
     def mof_is_embedded?; false end
-    desc "Notifications - Indicates if Windows update agent should notify about updates, see:https://msdn.microsoft.com/en-us/library/windows/desktop/aa385806%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396. Valid values are Disabled, ScheduledInstallation."
+    desc "Notifications - Indicates if Windows update agent should notify about updates, see:https://msdn.microsoft.com/en-us/library/windows/desktop/aa385806%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396. Valid values are Disabled, ScheduledInstallation, Scheduled installation."
     validate do |value|
       unless value.kind_of?(String)
         fail("Invalid value '#{value}'. Should be a string")
       end
-      unless ['Disabled', 'disabled', 'ScheduledInstallation', 'scheduledinstallation', 'scheduled installation', 'Scheduled installation'].include?(value)
-        fail("Invalid value '#{value}'. Valid values are Disabled, ScheduledInstallation")
+      unless ['Disabled', 'disabled', 'ScheduledInstallation', 'scheduledinstallation', 'Scheduled installation', 'scheduled installation'].include?(value)
+        fail("Invalid value '#{value}'. Valid values are Disabled, ScheduledInstallation, Scheduled installation")
       end
     end
   end
